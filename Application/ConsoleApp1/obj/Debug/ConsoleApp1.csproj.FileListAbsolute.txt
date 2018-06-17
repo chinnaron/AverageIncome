@@ -8,3 +8,7 @@ D:\Documents\GitHub\AverageIncome\Application\ConsoleApp1\obj\Debug\ConsoleApp1.
 D:\Documents\GitHub\AverageIncome\Application\ConsoleApp1\obj\Debug\ConsoleApp1.csproj.CopyComplete
 D:\Documents\GitHub\AverageIncome\Application\ConsoleApp1\obj\Debug\ConsoleApp1.exe
 D:\Documents\GitHub\AverageIncome\Application\ConsoleApp1\obj\Debug\ConsoleApp1.pdb
+D:\Documents\GitHub\AverageIncome\Application\ConsoleApp1\bin\Debug\ConsoleApp1.exe.manifest
+D:\Documents\GitHub\AverageIncome\Application\ConsoleApp1\bin\Debug\ConsoleApp1.application
+D:\Documents\GitHub\AverageIncome\Application\ConsoleApp1\obj\Debug\ConsoleApp1.exe.manifest
+D:\Documents\GitHub\AverageIncome\Application\ConsoleApp1\obj\Debug\ConsoleApp1.application
