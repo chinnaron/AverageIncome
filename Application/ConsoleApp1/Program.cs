@@ -41,14 +41,13 @@ namespace ConsoleApp1
                                 status = oGdPicturePDF.GetStat();
                                 if (status == GdPictureStatus.OK)
                                 {
+                                    var transactionLines = new List<Model>();
                                     text_file.WriteLine("Account No.,Account Name,Form,To,Transaction Date,Transaction Description,Deposit/Withdrawal,Transaction Amount,Remaining Balance,Remark");
-                                    //string page_text = null;
                                     for (int i = 1; i <= pageCount; i++)
                                     {
                                         status = oGdPicturePDF.SelectPage(i);
                                         if (status == GdPictureStatus.OK)
                                         {
-                                            var transactionLines = new List<Model>();
                                             var page_text = oGdPicturePDF.GetPageText();
                                             status = oGdPicturePDF.GetStat();
                                             if (status == GdPictureStatus.OK)
@@ -60,13 +59,12 @@ namespace ConsoleApp1
                                                 //Separate pdf 1 and 2
                                                 if (name.Contains("1"))
                                                 {
-                                                    var model = new Model();
                                                     var loop = false;
                                                     var lastLine = "";
+                                                    var model = new Model();
                                                     foreach (var line in lines)
                                                     {
                                                         if (string.IsNullOrEmpty(line.Trim())) continue;
-                                                        //text_file.WriteLine(line);
                                                         //AccountNo & AccountName
                                                         if (line.Contains("Account"))
                                                         {
@@ -144,8 +142,12 @@ namespace ConsoleApp1
                                                             {
                                                                 model.TxnDescription += lineTemp[j];
                                                             }
-
-                                                            transactionLines.Add(model);
+                                                            var addModel = new Model()
+                                                            {
+                                                                AccountNo = model.AccountNo,
+                                                                
+                                                            };
+                                                            transactionLines.Add(model.CopyModel());
                                                             text_file.WriteLine(model.ToLineString());
                                                             lastLine = line;
                                                             loop = true;
@@ -160,7 +162,6 @@ namespace ConsoleApp1
                                                     foreach (var line in lines)
                                                     {
                                                         if (string.IsNullOrEmpty(line.Trim())) continue;
-                                                        //text_file.WriteLine(line);
                                                         //AccountNo
                                                         if (line.Contains("àÅ¢·ÕèºÑ­ªÕ"))
                                                         {
@@ -242,20 +243,19 @@ namespace ConsoleApp1
                                                                 model.Remark += lineTemp[j];
                                                             }
 
-                                                            transactionLines.Add(model);
+                                                            transactionLines.Add(model.CopyModel());
                                                             text_file.WriteLine(model.ToLineString());
                                                             lastLine = line;
                                                             loop = true;
                                                         }
                                                     }
                                                 }
-
-                                                //Average income
-                                                text_file.WriteLine("\nAvarage Income," + AvgIncome(transactionLines));
                                             }
                                         }
                                     }
-                                    //text_file.Write("\n");
+
+                                    //Average income
+                                    text_file.WriteLine("\nAvarage Income," + AvgIncome(transactionLines));
                                 }
                                 text_file.Close();
                             }
@@ -293,20 +293,10 @@ namespace ConsoleApp1
                 var idx = 0;
                 var count = 0;
                 float sum = 0;
-                var previous = new List<Model>() { models[idx] };
-                for (var j = idx + 1; j < models.Count; j++)
-                {
-                    if (models[j].TxnDate > previous.FirstOrDefault().TxnDate)
-                    {
-                        idx = j;
-                        break;
-                    }
-                    previous.Add(models[j]);
-                }
                 var current = new List<Model>() { models[idx] };
                 for (var j = idx + 1; j < models.Count; j++)
                 {
-                    if (models[j].TxnDate > current.FirstOrDefault().TxnDate)
+                    if (models[j].TxnDate > current[0].TxnDate)
                     {
                         idx = j;
                         break;
@@ -315,18 +305,42 @@ namespace ConsoleApp1
                 }
                 for (var j = idx; j < models.Count; j++)
                 {
-                    var balance = current[0].RemainingBalance;
-                    for (var k = 0; k < previous.Count; k++)
+                    var balance = models[idx].RemainingBalance;
+                    for (var k = 0; k < current.Count; k++)
                     {
+                        for (var l = k + 1; l < current.Count; l++)
+                        {
+                            if (current[k].TxnAmount > current[l].RemainingBalance)
+                                continue;
+                            if(models[idx].TxnDate >= current[k].TxnDate.AddDays(1) && current[k].Type.Equals("Deposit"))
+                            {
+                                sum += current[k].TxnAmount;
+                                count++;
+                                //Break
+                                l = k = current.Count;
+                            }
+                        }
+                    }
 
+                    current = new List<Model>() { models[idx] };
+                    for (var k = idx + 1; k < models.Count; k++)
+                    {
+                        if (models[k].TxnDate > current.FirstOrDefault().TxnDate)
+                        {
+                            idx = k;
+                            break;
+                        }
+                        current.Add(models[k]);
                     }
                 }
+                if (count > 0)
+                    return sum / count;
+                return 0;
             }
             catch (Exception e)
             {
                 return 0;
             }
-            return 0;
         }
     }
 }

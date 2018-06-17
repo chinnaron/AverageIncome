@@ -24,5 +24,23 @@ namespace ConsoleApp1
             return AccountNo + "," + AccountName + "," + From.ToShortDateString() + "," + To.ToShortDateString() + ","
                 + TxnDate.ToShortDateString() + "," + TxnDescription + "," + Type + "," + TxnAmount + "," + RemainingBalance + "," + Remark;
         }
+
+        public Model CopyModel()
+        {
+            if (this == null) return new Model();
+            return new Model
+            {
+                AccountNo = this.AccountNo,
+                AccountName = this.AccountName,
+                From = this.From,
+                To = this.To,
+                TxnDate = this.TxnDate,
+                TxnDescription = this.TxnDescription,
+                Type = this.Type,
+                TxnAmount = this.TxnAmount,
+                RemainingBalance = this.RemainingBalance,
+                Remark = this.Remark
+            };
+        }
     }
 }
